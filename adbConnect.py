@@ -1,73 +1,61 @@
 import subprocess
 from subprocess import CalledProcessError, Popen, PIPE
-import os
-import logging
+import time
 
-logging.info('Starting adbConnect')
+#logging.info('Starting adbConnect')
 
 #create an empty list to store device serial numbers
 device_list = []
 
-def run_bash(command):
-    try:
-        ps = Popen(command.split(), stdout = PIPE)
-        ps.wait()
+def runBashCommands(bc_list):
+
+    # run a process with a given command, send output to PIPE
+    proc = Popen(bc_list[0].split(), stdout=PIPE)
+    for i in range(len(bc_list) - 1):
+       
+        proc = Popen(bc_list[i + 1].split(), stdin=proc.stdout, stdout=PIPE)
+    return proc.communicate()[0].rstrip().decode('ascii')
+
+adb_conn = "adb devices"
+adb_process = Popen(adb_conn.split(), stdout=PIPE)
+adb_data = adb_process.communicate()[0].rstrip().decode('ascii').splitlines()
+
+print(adb_data)
+
+
+def conn_success(input):
+
+    if len(input) <= 1:
+        return conn_attempt()
         
+    else:
+        print("Successfully connected")
+        return input
 
-    except CalledProcessError as e:
-        logging.error(e)
 
+def conn_attempt():
+    i = 0
+    print("Looking for wired connections")
+    while i < 6:
+        adb_conn = "adb devices"
+        adb_process = Popen(adb_conn.split(), stdout=PIPE)
+        adb_data = adb_process.communicate()[0].rstrip().decode('ascii').splitlines()
+        if len(adb_data) > 1:
+            return adb_data
 
-#Establish if device is connected to adb
-def adb_devices():
-    #check if device is connected to adb
-    if device_list == []:
-        try:
-            for each in subprocess.check_output(['adb', 'devices']).splitlines():
-                if each.endswith(b'device'):
-                    device_list.append(each.split()[0].decode('utf-8'))
-                    if device_list:
-                        logging.info('Device connected')
-                        continue
-                    else:
-                        while i < 5:
-                            adb_devices()
-                            i += 1
-        except:
-            #if device is not connected to adb, exit program
-            logging.info('No Device Connected, Please Connect or add a device')
+        time.sleep(10)
+        i = i + 1
+        
+    else:
+        print("Unable to establish connection")
+        return
 
-def ip_connect():
-    #check to see if any item in device list is an IP address
-    for each in device_list:
-        if each.startswith('192.168.'):
-            #if IP address is found, try to connect to adb via IP address
-            try:    
-                adb_conn = 'adb connect ' +  each  +''
-                run_bash(adb_conn)
-                logging.info('Connecting to adb via IP address')
-                #if connection is successful, log success
-                if each in subprocess.check_output(['adb', 'devices']).splitlines():
-                    logging.info('Connection Successful')
-            except:
-                logging.info('Could not connect to adb via IP address')
-        else:
-            continue
+                        
+adb_data = conn_success(adb_data)
 
-#create a method that if device loses connection via ip address, reconnects to adb via IP address
-def ip_reconnect():
-    #check to see if any item in device list is an IP address
-    for each in device_list:
-        if each.startswith('192.168.'):
-            #if IP address is found, try to connect to adb via IP address
-            try:    
-                adb_conn = 'adb connect ' +  each  +''
-                run_bash(adb_conn)
-                logging.info('Reconnecting to adb via IP address')
-                #if connection is successful, log success
-                if each in subprocess.check_output(['adb', 'devices']).splitlines():
-                    logging.info('Reconnection Successful')
-            except:
-                logging.info('Could not reconnect to adb via IP address')
-        else:
-            continue
+adb_sl = []
+for i in range(len(adb_data)):
+    if i > 0:
+        adb_sl.append(adb_data[i].split()[0])
+
+print(adb_sl)

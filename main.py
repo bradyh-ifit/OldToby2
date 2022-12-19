@@ -1,7 +1,7 @@
 from tobyGui import *
 import logging 
 import logging.handlers
-from adbConnect import adb_devices
+#from adbConnect import adb_devices
 from textHandler import TextHandler
 
 def main():
@@ -24,7 +24,7 @@ def main():
 
     gui.build_gui()
 
-    adb_devices()
+    #adb_devices()
 
     root.mainloop()
 

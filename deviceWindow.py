@@ -1,15 +1,21 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
-from adbConnect import device_list
 import logging
-from tobyGui import MyGui
+import adbConnect
+import adbConnectIp
 
 
+device_list = []
+device_ip = []
 
-def new_window():
+for each in adbConnect.adb_sl:
+    device_list.append(each)
+
+
+def new_window(parent):
     #connect new_window to root
-    new_window = tk.Toplevel(MyGui.root)
+    new_window = tk.Toplevel(parent)
     new_window.geometry('500x500')
     new_window.title('Add New Device')
 
@@ -46,19 +52,25 @@ def new_window():
         if new_ip.get('1.0', 'end-1c') == '':
             messagebox.showerror('Error', 'Please enter an IP Address')
         else:
-            device_list.append(new_ip.get('1.0', 'end-1c'))
+            device_ip.append(new_ip.get('1.0', 'end-1c'))
             listbox.insert(0, new_ip.get('1.0', 'end-1c'))
             new_ip.delete('1.0', 'end')
-            logging.info(device_list)
+            
     
 
     #add a delete button to delete a device from the list
     def delete_click():
         try:
-            device_list.remove(listbox.get(listbox.curselection()))
+            device_ip.remove(listbox.get(listbox.curselection()))
             listbox.delete(listbox.curselection())                   
         except:
             messagebox.showerror('Error', 'Please select a device to delete')
+
+    def save_click():
+        for each in device_ip:
+            adbConnectIp.adb_connect_ip(each)
+        
+        
 
     button_frame = Frame(new_window, padx=10, pady=10)
     button_frame.pack()
@@ -72,7 +84,7 @@ def new_window():
     remove_button.grid(row=0, column=1, padx=10, pady=10, sticky='w')
 
     #create a save button
-    save_button = Button(button_frame, text='Save', command=new_window.destroy)
+    save_button = Button(button_frame, text='Connect Device', command=save_click)
     save_button.grid(row = 0, column = 2, padx=10, pady=10)
 
     #create a button to close the window
