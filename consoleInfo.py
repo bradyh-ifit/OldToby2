@@ -1,16 +1,8 @@
 from cProfile import run
 import logging
-import subprocess
 from subprocess import Popen, PIPE, check_output, CalledProcessError
-from adbConnect import device_list
 import json
-from googleSheet import tabTrackingDict, google_tablet
 
-for each in device_list:
-    adb_sn = each
-
-
-logging.info("initializing tablet")
 
 def run_bash(command):
     try:
@@ -29,7 +21,9 @@ def runBashCommands(bc_list):
 
     return proc.communicate()[0].rstrip().decode('ascii')
 
-def get_admin():
+
+#methods for getting  versions and console info.
+def get_admin(adb_sn):
     admin = runBashCommands([f'adb -s {adb_sn} shell pm dump com.ifit.eru | grep "versionName"'])
     a = admin.split('=')[1].split()[0]
 
@@ -41,7 +35,7 @@ def get_admin():
     return c
 
 
-def get_wolf():
+def get_wolf(adb_sn):
     try:
         admin = runBashCommands([f'adb -s {adb_sn} shell pm dump com.ifit.standalone | grep "versionName"'])
         a = admin.split('=')[1].split()[0]
@@ -57,7 +51,7 @@ def get_wolf():
         exit()
 
 
-def get_webview():
+def get_webview(adb_sn):
     admin = runBashCommands([f'adb -s {adb_sn} shell pm dump com.android.webview | grep "versionName"'])
     a = admin.splitlines()[0].split('=')[1].split('.')[0]
 
@@ -65,7 +59,7 @@ def get_webview():
 
 
 
-def get_launcher():
+def get_launcher(adb_sn):
     launch = runBashCommands([f'adb -s {adb_sn} shell pm dump com.ifit.launcher | grep "versionName"'])
     a = launch.splitlines()[0].split('=')[1]
 
@@ -76,28 +70,27 @@ def get_launcher():
 
     return c
 
-
-def get_uuid():
-    uuid = runBashCommands([f'adb -s {adb_sn} shell cat ./sdcard/.ConsoleUpdateId'])
-    x = json.loads(uuid)
-    y = x['Guid']
-    return y
-
-
-def part_number():
-    part_number = runBashCommands([f'adb -s {adb_sn} shell cat ./sdcard/.ConsoleInfo'])
-    a = json.loads(part_number)
-    b = a['PartNumber']
-    return b
-
-
-def get_brainboard():
+def get_brainboard(adb_sn):
     brainboard = runBashCommands([f'adb -s {adb_sn} shell cat ./sdcard/.ConsoleInfo'])
     a = json.loads(brainboard)
     b = a['MasterLibraryVersion']
     c = a['MasterLibraryBuild']
     d = float(f'{b}.{c}')
     return d
+
+
+def get_uuid(adb_sn):
+    uuid = runBashCommands([f'adb -s {adb_sn} shell cat ./sdcard/.ConsoleUpdateId'])
+    x = json.loads(uuid)
+    y = x['Guid']
+    return y
+
+
+def part_number(adb_sn):
+    part_number = runBashCommands([f'adb -s {adb_sn} shell cat ./sdcard/.ConsoleInfo'])
+    a = json.loads(part_number)
+    b = a['PartNumber']
+    return b
 
 def get_console_num():
     console_num = 0
@@ -118,35 +111,6 @@ def get_console():
 
     return console_info
 
-
-def console_info():
-    logging.info('asking for console info')
-    tabTrackingDict["uuid"] = get_uuid()
-    tabTrackingDict["software_number"] = part_number()
-    tabTrackingDict["update_type"] = "Wifi 1 Hour Idle"
-    tabTrackingDict["server"] = "Launch Darkly"
-    tabTrackingDict["size"] = "N/A"
-    tabTrackingDict["console"] = get_console()
-    tabTrackingDict["console_num"] = get_console_num()
-    logging.info('console info received')
-
-def get_version1():   
-    logging.info('asking for version 1 info')
-    tabTrackingDict["brainboard1"] = get_brainboard()
-    tabTrackingDict["admin_version1"] = get_admin()
-    tabTrackingDict["wolf_version1"] = get_wolf()
-    tabTrackingDict["webview1"] = get_webview()
-    tabTrackingDict["launcher1"] = get_launcher()
-    logging.info('version 1 info received')
-
-def get_version2():
-    logging.info('asking for version 2 info')
-    tabTrackingDict["admin_version2"] = get_admin()
-    tabTrackingDict["wolf_version2"] = get_wolf()
-    tabTrackingDict["webview2"] = get_webview()
-    tabTrackingDict["brainboard2"] = get_brainboard()
-    tabTrackingDict["launcher2"] = get_launcher()
-    logging.info('version 2 info received')
 
 
         

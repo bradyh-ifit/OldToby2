@@ -2,6 +2,8 @@ import subprocess
 from subprocess import CalledProcessError, Popen, PIPE
 import logging
 
+adb_ip = []
+
 def run_bash(bc_list):
 
     # run a process with a given command, send output to PIPE
@@ -20,6 +22,9 @@ def adb_connect_ip(ip):
     try:
         run_bash([f'adb connect {ip}'])
         
+        #if connection is successful, add ip to adb_ip list
+        adb_ip.append(ip)
+
         return True
     except:
         return False

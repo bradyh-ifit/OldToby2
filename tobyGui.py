@@ -11,7 +11,7 @@ from tobyList import *
 import logging
 import threading
 from threading import Thread
-from fullTest import reset_app
+from testMethods import reset_app
 import deviceWindow
 
 

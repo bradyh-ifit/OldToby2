@@ -3,9 +3,7 @@ from subprocess import CalledProcessError, Popen, PIPE
 import time
 
 #logging.info('Starting adbConnect')
-
-#create an empty list to store device serial numbers
-device_list = []
+adb_sl = []
 
 def runBashCommands(bc_list):
 
@@ -50,12 +48,11 @@ def conn_attempt():
         print("Unable to establish connection")
         return
 
-                        
-adb_data = conn_success(adb_data)
 
-adb_sl = []
-for i in range(len(adb_data)):
-    if i > 0:
-        adb_sl.append(adb_data[i].split()[0])
+def start_connect():                        
+    tablet_sn = conn_success(adb_data)
 
-print(adb_sl)
+
+    for i in range(len(tablet_sn)):
+        if i > 0:
+            adb_sl.append(tablet_sn[i].split()[0])
