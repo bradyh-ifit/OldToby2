@@ -34,7 +34,6 @@ class googleSheetsTablet:
 
     def upload(self):
         try:
-            logging.info("we are testing the logging while gui is running")
             MainSheet = self.MasterListSheet.worksheet_by_title(
                 'Masterv2.0')    # selecting the Masterv2.0 sheet
             LastColumn = 'AB'    # last column on the tracker sheet
@@ -43,10 +42,9 @@ class googleSheetsTablet:
             firstEmptyRow = firstColumn.index(['']) + 1
             Date = datetime.date.strftime(
                 datetime.date.today(), '%m/%d/%Y')    # getting today's date
-            tabTrackingDict["date"] = Date    # set date in the key list
+            tabTrackingDict["date"] = Date # set date in the key list
             # list of values that will appear in the google sheet
 
-            logging.info("we are testing the logging while gui is running - 2")
             sheetVals = list(tabTrackingDict.values())
             print(f"sheetvals: {sheetVals}")
             MainSheet.update_values(crange=f'A{firstEmptyRow}:{LastColumn}{firstEmptyRow}', values=[sheetVals])    # Sending data to Google sheets

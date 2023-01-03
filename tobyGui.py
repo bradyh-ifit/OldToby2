@@ -9,10 +9,9 @@ from tkinter import messagebox
 from typing import List
 from tobyList import *
 import logging
-import threading
 from threading import Thread
-from testMethods import reset_app
 import deviceWindow
+import consoleHub
 
 
 class MyGui(tk.Frame):
@@ -85,19 +84,19 @@ class MyGui(tk.Frame):
         clicked_wolf = StringVar()
         clicked_wolf.set("Choose Wolf")
 
-        drop_wolf = OptionMenu(drop_frame, clicked_admin, *options_wolf)
+        drop_wolf = OptionMenu(drop_frame, clicked_wolf, *options_wolf)
         drop_wolf.grid(row=3, column=1, sticky=W, padx=15, pady=10)
 
         clicked_launch = StringVar()
         clicked_launch.set("Choose Launcher")
 
-        drop_launch = OptionMenu(drop_frame, clicked_admin, *options_launcher)
+        drop_launch = OptionMenu(drop_frame, clicked_launch, *options_launcher)
         drop_launch.grid(row=3, column=2, padx=15, pady=10)
 
         clicked_web= StringVar()
         clicked_web.set("Choose Webview")
 
-        drop_web = OptionMenu(drop_frame, clicked_admin, *options_webview)
+        drop_web = OptionMenu(drop_frame, clicked_web, *options_webview)
         drop_web.grid(row=3, column=3, sticky=E, padx=15, pady=10)
 
         #radio button selections
@@ -125,7 +124,7 @@ class MyGui(tk.Frame):
         #create a graphical user interface for the radio buttons using tkinter
 
         radio_var = IntVar()
-        radio_var.set(0)
+        radio_var.set(1)
 
         radio_var1 =IntVar()
         radio_var1.set(1)
@@ -157,6 +156,8 @@ class MyGui(tk.Frame):
         #create check buttons for the custom test
         check_one = Checkbutton(radio_frame, text="Wolf", variable=radio_var1)
         check_one.grid(row=3, column=1, sticky=W, padx=15, pady=10)
+        #create uncheck option for the check buttons
+        check_one.deselect()
 
         check_two = Checkbutton(radio_frame, text="Admin", variable=radio_var2)
         check_two.grid(row=3, column=2, padx=15, pady=10)
@@ -173,6 +174,13 @@ class MyGui(tk.Frame):
         check_six = Checkbutton(radio_frame, text="OS", variable=radio_var6)
         check_six.grid(row=4, column=3, sticky=E, padx=15, pady=10)
 
+        check_one.configure(state='disabled')
+        check_two.configure(state='disabled')
+        check_three.configure(state='disabled')
+        check_four.configure(state='disabled')
+        check_five.configure(state='disabled')
+        check_six.configure(state='disabled')
+
         # #Scrolling Text (SHELL) Window for logging
         text_label = Label(text_frame, text='Log Output')
         text_label.configure(font=("Terminal", 14, "bold", "underline"))
@@ -181,16 +189,15 @@ class MyGui(tk.Frame):
         self.log_window.grid(row=2, column=1, padx=10, pady=10)
 
         def test_update():
-            global stop
-            stop = True
-            if stop == True:
-                if radio_var.get() == 1 or adb_devices == True:
-                    reset_app()
-
-                else:
-
-                    logging.info('Please select a test mode')
-                    return
+            if radio_var.get() == 1:
+                logging.info('Full Test Selected, running Test Please Wait...')
+                consoleHub.full_test()
+            elif radio_var.get() == 2:
+                logging.info('Quick Test Selected, running Test Please Wait...')
+                consoleHub.quick_test()
+            elif radio_var.get() == 3:
+                logging.info('Custom Test Selected, running Test Please Wait...')
+                consoleHub.custom_test()
 
         #Button Selections
         button_one = Button(button_frame, text="Run Test", command=test_update)

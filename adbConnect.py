@@ -34,7 +34,7 @@ def conn_success(input):
 def conn_attempt():
     i = 0
     print("Looking for wired connections")
-    while i < 6:
+    while i < 1:
         adb_conn = "adb devices"
         adb_process = Popen(adb_conn.split(), stdout=PIPE)
         adb_data = adb_process.communicate()[0].rstrip().decode('ascii').splitlines()

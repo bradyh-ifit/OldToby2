@@ -1,7 +1,6 @@
 import logging
 from subprocess import Popen, PIPE, check_output, CalledProcessError
 import time
-from googleSheet import google_tablet, tabTrackingDict
 
 
 
@@ -22,7 +21,7 @@ def idle_broadcast(adb_sn):
 def test_environment(adb_sn):    
     run_bash(f'adb -s {adb_sn} shell touch ./sdcard/.wolfDev')
     run_bash(f'adb -s {adb_sn} shell am broadcast -a com.ifit.eru.UPDATE_ENVIRONMENT --ez  USE_TEST true')
-    tablet_reboot()
+    tablet_reboot(adb_sn)
     time.sleep(60)
 
 def tablet_reboot(adb_sn):  
@@ -35,18 +34,21 @@ def idle_broadcast(adb_sn):
     run_bash(f'adb -s {adb_sn} shell am broadcast -a com.ifit.eru.IDLE_UPDATE')
     time.sleep(60)
 
-def reset_wolf(adb_sn):    
-    run_bash(f'adb -s {adb_sn} uninstall com.ifit.standalone')
-    time.sleep(15)
+def reset_wolf(adb_sn):
+    try:    
+        run_bash(f'adb -s {adb_sn} uninstall com.ifit.standalone')
+        time.sleep(15)
+    except:
+        print('wolf not installed')
     run_bash(f'adb -s {adb_sn} install -r -d ./apkFiles/com.ifit.standalone-2.6.73.3252.apk')
     time.sleep(90)
 
 def reset_eru(adb_sn):    
     run_bash(f'adb -s {adb_sn} uninstall com.ifit.eru')
     time.sleep(15)
-    run_bash(f'adb -s {adb_sn} install -r -d ./apkFiles/com.ifit.eru-2.0.5.1213.apk')
+    run_bash(f'adb -s {adb_sn} install -r -d ./apkFiles/com.ifit.eru-2.1.1.1227.apk')
     time.sleep(90)
-    test_environment()
+    test_environment(adb_sn)
 
 def reset_launcher(adb_sn):    
     run_bash(f'adb -s {adb_sn} uninstall com.ifit.launcher')

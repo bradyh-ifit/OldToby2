@@ -21,9 +21,10 @@ def run_bash(bc_list):
 def adb_connect_ip(ip):
     try:
         run_bash([f'adb connect {ip}'])
-        
+        print(run_bash([f'adb devices']))
         #if connection is successful, add ip to adb_ip list
         adb_ip.append(ip)
+        print(adb_ip)
 
         return True
     except:
